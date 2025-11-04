@@ -3,6 +3,7 @@
 import sys
 import os
 import numpy as np
+import cv2
 
 # Add src directory to path
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'src'))
@@ -24,7 +25,6 @@ def create_sample_image():
     image[200:280, 250:350] = [200, 200, 200]
     
     # Propellers (four circles)
-    import cv2
     cv2.circle(image, (260, 210), 15, (150, 150, 150), -1)
     cv2.circle(image, (340, 210), 15, (150, 150, 150), -1)
     cv2.circle(image, (260, 270), 15, (150, 150, 150), -1)

@@ -35,11 +35,24 @@ class DroneDetector:
         """
         if image is None or image.size == 0:
             return []
+        
+        # Validate image format and convert to grayscale
+        if len(image.shape) == 2:
+            # Already grayscale
+            gray = image
+        elif len(image.shape) == 3:
+            if image.shape[2] == 3:
+                # BGR image
+                gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+            elif image.shape[2] == 4:
+                # BGRA image
+                gray = cv2.cvtColor(image, cv2.COLOR_BGRA2GRAY)
+            else:
+                raise ValueError(f"Unsupported image format with {image.shape[2]} channels")
+        else:
+            raise ValueError(f"Invalid image dimensions: {image.shape}")
             
         detections = []
-        
-        # Convert to grayscale for processing
-        gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
         
         # Apply Gaussian blur to reduce noise
         blurred = cv2.GaussianBlur(gray, (5, 5), 0)
@@ -109,9 +122,19 @@ class DroneDetector:
             width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
             height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
             
+            # Validate video properties
+            if fps <= 0:
+                raise ValueError(f"Invalid FPS: {fps}")
+            if width <= 0 or height <= 0:
+                raise ValueError(f"Invalid video dimensions: {width}x{height}")
+            
             if output_path:
                 fourcc = cv2.VideoWriter_fourcc(*'mp4v')
                 writer = cv2.VideoWriter(output_path, fourcc, fps, (width, height))
+                
+                # Validate writer initialization
+                if not writer.isOpened():
+                    raise ValueError(f"Failed to initialize VideoWriter for {output_path}")
             
             while True:
                 ret, frame = cap.read()

@@ -85,6 +85,36 @@ class TestDroneDetector(unittest.TestCase):
         self.assertEqual(annotated.shape, image.shape)
         # Image should have been modified (not all zeros anymore)
         self.assertTrue(np.any(annotated != 0))
+    
+    def test_detect_grayscale_image(self):
+        """Test detection with grayscale image."""
+        # Create a grayscale test image
+        image = np.zeros((500, 500), dtype=np.uint8)
+        image[150:250, 150:250] = 255
+        
+        detections = self.detector.detect(image)
+        
+        # Should handle grayscale images
+        self.assertIsInstance(detections, list)
+    
+    def test_detect_bgra_image(self):
+        """Test detection with BGRA (4-channel) image."""
+        # Create a BGRA test image
+        image = np.zeros((500, 500, 4), dtype=np.uint8)
+        image[150:250, 150:250] = [255, 255, 255, 255]
+        
+        detections = self.detector.detect(image)
+        
+        # Should handle BGRA images
+        self.assertIsInstance(detections, list)
+    
+    def test_detect_invalid_image_format(self):
+        """Test detection with invalid image format."""
+        # Create an invalid 5-channel image
+        image = np.zeros((500, 500, 5), dtype=np.uint8)
+        
+        with self.assertRaises(ValueError):
+            self.detector.detect(image)
 
 
 if __name__ == '__main__':
